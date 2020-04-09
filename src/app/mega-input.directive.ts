@@ -21,8 +21,9 @@ export class MegaInputDirective implements ControlValueAccessor {
     let userInput = numeral().unformat(targetElement.value);
     console.log('numeral value=', userInput)
     if(this.fractionSize){
-      let digitOptStr = `1.0-${this.fractionSize}`;
-      //userInput = this.decimalPipe.transform(userInput, digitOptStr);
+      userInput = Number(userInput.toFixed(this.fractionSize));
+      var rounder = Math.pow(10, this.fractionSize);
+      userInput = (userInput * rounder) / rounder;
     }
     this.onChangeCallback(userInput);
     this.writeValue(userInput)
