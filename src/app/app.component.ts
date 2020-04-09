@@ -7,4 +7,5 @@ import { Component } from '@angular/core';
 })
 export class AppComponent {
   title = 'ngx-mega-input';
+  target = 1000.333;
 }
