@@ -18,8 +18,12 @@ export class MegaInputDirective implements ControlValueAccessor {
   onChangeCallback = (_: any) => {};
   onTouchedCallback = () => {};
   changeValueFn(targetElement: any){
-    let userInput = numeral().unformat(targetElement.value);
-    console.log('numeral value=', userInput)
+    let raw = targetElement.value;
+    raw = raw.toLowerCase().replace(/ /g, '');
+    raw = raw.replace(/[^\dkmbt.-]/g, '');
+    if(this.fractionSize == null) 
+      raw = raw.replace(/[^\dkmbt-]/g, '');
+    let userInput = numeral().unformat(raw);
     if(this.fractionSize){
       userInput = Number(userInput.toFixed(this.fractionSize));
       var rounder = Math.pow(10, this.fractionSize);
@@ -29,55 +33,12 @@ export class MegaInputDirective implements ControlValueAccessor {
     this.writeValue(userInput)
   }
 
-  /*Check permission for decimal point */
-  isFirstDecimalPoint(targetElement: any) {
-    let isValid = false;
-    if (this.fractionSize) {
-      let value = targetElement.value;
-      let precisionArr = value.split(this.separator);
-      if (precisionArr != undefined && precisionArr.length == 1)
-        isValid = true;
-    }
-    return isValid;
-  }
-
-  /* Check permission for minus character */
-  isFirstMinusCharacter(targetElement: any) {
-    let isValid = false;
-    let value = targetElement.value;
-    if (value != undefined) {
-      if (!value.toString().includes("-"))
-        isValid = true;
-    }
-    return isValid;
-  }
-
-  // @HostListener('input', ['$event.target']) input(targetElement: any) {
-  //     console.log('input change event');
-  // }
-  // @HostListener('keydown', ['$event']) input(event: KeyboardEvent) {
-  //   console.log('keydown event');
-  //   var key = event.keyCode;
-  //   if (key == 190 && this.isFirstDecimalPoint(event.target))
-  //     return;
-  //   if (key == 189 && this.isFirstMinusCharacter(event.target))
-  //     return;
-  //   // If the keys include the CTRL, SHIFT, ALT, or META keys, or the arrow keys, do nothing.
-  //   // This lets us support copy and paste too
-  //   if (key == 91 || (15 < key && key < 19) || (37 <= key && key <= 40))
-  //     return
-
-  //   //$browser.defer(listener)
-  // }
   @HostListener('blur',['$event.target']) touched(targetElement: any) {
-      console.log('blur event')
       this.changeValueFn(targetElement);
       this.onTouchedCallback();
-  };
+  }
   @HostListener('paste', ['$event.target']) paste(targetElement: any) {
-    console.log('paste event');
-    // this.changeValueFn(targetElement);
-    // this.onTouchedCallback();
+    
   }
 
   constructor(private _renderer: Renderer2, private _elementRef: ElementRef, private decimalPipe: DecimalPipe) {
